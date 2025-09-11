@@ -1,28 +1,47 @@
 const verifySocketToken = require("./middlewares/verifySocketToken");
 const { saveMessage } = require("./Models/message.model");
+const {getRelatedUsers, updateLastSeen} = require("./Models/user.model");
 const { getConversationHistory, isConversation, createConversation} = require("./Models/conversation.model");
 
 module.exports = function socketEventHandlers(io) {
     io.use(verifySocketToken);
 
+    const userSocket = new Map();
+    
+
     // listen for connections------------
-    io.on("connection", (socket) => {
+    io.on("connection", async (socket) => {
         console.log("A user connected: ", socket.user.userId);
 
-        const users = [];
-        for (let [id, socket] of io.of("/").sockets) {
-            users.push({
-                userID: socket.user.userId,
-                username: socket.user.username,
+        const {userId} = socket.user
+        // To keep track of multiple connections of a user:
+        // user set holds multiple socketId assosiated with a user;
+        const userSet = userSocket.get(userId) || new Set(); 
+        userSet.add(socket.id);
+
+        // Add user to the map
+        userSocket.set(userId, userSet);
+        const relatedUsers = await getRelatedUsers(userId);
+ 
+
+        if (userSet.size === 1) {
+            // notify related users about user presence
+            relatedUsers.forEach(item => {
+                const related_user_sockets = userSocket.get(item.related_user) || new Set();
+                related_user_sockets.forEach(user_socket => {
+                    io.to(user_socket).emit(
+                        "presence", 
+                        {userId, status:"Online", last_seen:""}
+                    )
+                });
             });
         }
-        socket.emit("users", users);
+        // Send list of related online users to connected user;
+        const related_online_users = relatedUsers.filter((item) => userSocket.has(item.related_user));
+        console.log("Related online users: ", related_online_users);
+        socket.emit("online_users", {related_online_users});
 
-        // notify existing users about new connection
-        socket.broadcast.emit("A user connected", {
-            userID: socket.user.userId,
-            username: socket.user.username,
-        });
+
 
         // listen for join room------------------------------------------------------
         socket.on("join_room", async (data) => {
@@ -120,12 +139,30 @@ module.exports = function socketEventHandlers(io) {
 
 
         // On user disconnect
-        socket.on("disconnect", () => {
+        socket.on("disconnect", async () => {
             console.log("A user disconnected:", socket.user.userId);
+
+            userSet.delete(socket.id);
             // notify existing users about a user disconnect
-            socket.broadcast.emit("A user disconnected", {
-                userID: socket.user.userId,
-            });
+            if (userSet.size === 0) {
+
+                userSocket.delete(userId);    
+            // save last seen to db
+                const now = new Date();
+                await updateLastSeen(now, userId);
+
+            // notify related users about user presence
+                relatedUsers.forEach(item => {
+                    const related_user_sockets = userSocket.get(item.related_user) || new Set();
+                    related_user_sockets.forEach(user_socket => {
+                        io.to(user_socket).emit(
+                            "presence", 
+                            {userId, status:"Offline", last_seen: now}
+                        )
+                    });
+                });
+        }
+
         });
     });
 };

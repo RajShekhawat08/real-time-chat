@@ -55,6 +55,7 @@ async function getAllConversations(user_id) {
         `SELECT c.id AS conversation_id,
                 cp2.user_id AS receiver_id,
                 u.username AS receiver_username,
+                u.last_seen AS last_seen,
                 m.id AS message_id,
                 m.message_text AS last_message,
                 m.created_at AS created_at

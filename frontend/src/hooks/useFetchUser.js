@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import { getUserInfo, getUserConversations } from "../services/userService";
@@ -8,8 +8,9 @@ import { initSocket, disconnectSocket } from "../services/socket";
 /*
 The hook ensures:
 The user is authenticated (valid access token in react state, if not -> refresh).
-User info is loaded into context
 Socket connection setup if valid token
+User info is loaded into context
+Fetch user conversations 
 */
 export function useFetchUser() {
     const { accessToken, setUser, setChats, logout, refreshAccessToken} =
@@ -17,6 +18,7 @@ export function useFetchUser() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // console.log("useFetchUser is executed;")
         async function fetchUserData() {
             try {
                 if (!accessToken) {

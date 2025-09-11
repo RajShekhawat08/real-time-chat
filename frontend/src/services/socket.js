@@ -14,6 +14,15 @@ export const initSocket = (token) => {
             console.log("Connection Established");
         });
 
+        // socket.on("presence", ({userId, status}) => {
+        //     console.log(`user ${userId} is ${status}.`);
+        // });
+
+        // socket.on("online_users", ({related_online_users}) => {
+        //     const online_users = related_online_users.map(element => element.related_user);  
+        //     console.log("List of online users: ",online_users);
+        // });
+
         socket.onAny((event, ...args) => {
             console.log(event, args);
         });

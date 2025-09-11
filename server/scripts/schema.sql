@@ -47,7 +47,12 @@
 -- --  Create Indexing for messages: 
 -- CREATE INDEX idx_convers_id ON messages(conversation_id, created_at);
 
+-- ADD last seen column in users table: 
+-- ALTER TABLE users ADD COLUMN last_seen TIMESTAMP;
 
+
+
+------------------------------------------------------------------------
 -- SELECT  c.id AS conversation_id, 
 --         cp2.user_id AS other_user,
 --         u.username AS other_username, 
@@ -65,3 +70,9 @@
 --     LIMIT 1
 -- ) m ON TRUE
 -- WHERE c.is_group = FAlSE;
+
+
+-- SELECT cp2.user_id AS related_userid
+--       FROM conversations c
+--       JOIN conversation_participants cp1 ON c.id = cp1.conversation_id AND cp1.user_id = 3
+--       JOIN conversation_participants cp2 on c.id = cp2.conversation_id AND cp2.user_id <> 3;

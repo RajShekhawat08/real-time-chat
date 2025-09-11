@@ -3,7 +3,7 @@ import { getSocket } from "../services/socket";
 
 export const useChat = (senderId, receiverId, initialConversationId = null) => {
     const [messages, setMessages] = useState([]);
-    const [status, setStatus] = useState("");
+    const [isTyping, setIsTyping] = useState("");
     const [conversationId, setConversationId] = useState(initialConversationId);
     const [tempRoom, setTempRoom] = useState(null);
 
@@ -48,12 +48,12 @@ export const useChat = (senderId, receiverId, initialConversationId = null) => {
         // Listen for Typing events------------------------------
         socket.on("isTyping",  ({senderId}) => {
             // console.log(`user ${senderId} is typing`);
-            setStatus("Typing...");
+            setIsTyping("Typing...");
         });
 
         socket.on("user_stopped_typing",  ({senderId}) => {
             // console.log("user stopped typing");
-            setStatus("");
+            setIsTyping("");
         });
 
 
@@ -125,5 +125,5 @@ export const useChat = (senderId, receiverId, initialConversationId = null) => {
 
     }, [conversationId, senderId]);
 
-    return { messages, sendMessage, status, Typing, conversationId };
+    return { messages, sendMessage, isTyping, Typing, conversationId };
 };

@@ -1,15 +1,17 @@
-import ChatListItem from "./ChatItems";
+import ChatListItem from "./ChatListItems";
 import { useRef, useEffect, useState } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 
 
-export default function Sidebar({ activeChat, setActiveChat }) {
+
+export default function Sidebar({ activeChat, setActiveChat, onlineUsers }) {
     const [searchInput, setSearchInput] = useState("");
     const [searhRes, setSearchRes] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const { accessToken, chats, setChats } = useContext(AuthContext);
+
 
     const dropdownRef = useRef(null);
     const searchTimerRef = useRef(null);
@@ -160,9 +162,11 @@ export default function Sidebar({ activeChat, setActiveChat }) {
                     <ChatListItem
                         key={chat?.conversation_id || chat.receiver_id}
                         chat={chat}
+                        isOnline={onlineUsers.includes(chat.receiver_id)}
                         active={activeChat?.receiver_id === chat.receiver_id}
                         onClick={() => {
-                            setActiveChat(chat);
+                            const active_chat = chats.find(element => element.receiver_id === chat.receiver_id);
+                            setActiveChat(active_chat);
                             console.log(chat);
                         }}
                     />

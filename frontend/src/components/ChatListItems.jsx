@@ -1,4 +1,4 @@
-export default function ChatListItem({ chat, active, onClick }) {
+export default function ChatListItem({ chat, isOnline, active, onClick }) {
     const message_time = chat.created_at;
 
     return (
@@ -9,12 +9,18 @@ export default function ChatListItem({ chat, active, onClick }) {
             }`}
         >
             <p className="font-semibold">{chat?.receiver_username || chat.username}</p>
+            {isOnline && (
+                <div className="inline-grid *:[grid-area:1/1]">
+                    <div className="status status-success animate-ping"></div>
+                    <div className="status status-success"></div>
+                </div>
+            )}
             <div className="flex justify-between items-center text-gray-400">
                 <p className="text-base">{chat?.last_message}</p>
                 <p className="text-sm">{message_time?.split("T")[0]}</p>
             </div>
         </li>
-    );
+    ); 
 }
 
 // todo: show last message

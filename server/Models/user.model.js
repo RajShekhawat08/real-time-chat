@@ -48,5 +48,25 @@ async function findUsers(username){
   return users?.rows;
 }
 
+// find related users
+async function getRelatedUsers(userId) {
 
-module.exports = {createUser, findUserByEmail, findUserByUsername, findUsers};
+    const result = await pool.query(
+      `SELECT cp2.user_id AS related_user
+      FROM conversations c
+      JOIN conversation_participants cp1 ON c.id = cp1.conversation_id AND cp1.user_id = $1
+      JOIN conversation_participants cp2 on c.id = cp2.conversation_id AND cp2.user_id <> $1`, 
+      [userId]
+    );
+    return result?.rows;
+}
+
+//update last seen status 
+async function updateLastSeen(last_seen, userId) {
+    await pool.query(
+      `UPDATE users SET last_seen = $1 WHERE id = $2`, 
+      [last_seen, userId]
+    );
+}
+
+module.exports = {createUser, findUserByEmail, findUserByUsername, findUsers, getRelatedUsers, updateLastSeen};
