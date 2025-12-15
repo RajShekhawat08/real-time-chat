@@ -70,15 +70,19 @@ npm install
 ```
 
 
-### PostgreSQL
+#### Put database credentials in .env file
+```
 PGHOST=your-db-host
 PGPORT=5432
-PGUSER=auth_app_user
+PGUSER=app_user
 PGPASSWORD=your-password
-PGDATABASE=auth_db
+PGDATABASE=realtimechat_db
+```
 
 Run the backend:
+```
 npm start
+```
 
 #### Frontend 
 ```
@@ -105,6 +109,5 @@ The frontend will start at http://localhost:5173.
     - React + Vite, TailwindCSS, Daisy-ui
     - Axios, socket.io-client
 
-## Future improvements
-- 
+
 
