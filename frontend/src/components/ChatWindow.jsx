@@ -74,9 +74,9 @@ export default function ChatWindow({ activeChat, setActiveChat, user, onlineUser
                         {activeChat.receiver_username}
                     </h2>
                     {isTyping ? (
-                        <p className="text-sm text-green-400">{isTyping}</p>
+                        <p className="text-base text-green-500">{isTyping}</p>
                     ) : presence ? (
-                        <p className="text-sm text-green-400">{presence}</p>
+                        <p className="text-base text-green-500">{presence}</p>
                     ) : (
                         <p className="text-sm text-gray-400">{`Last seen ${getFormattedDate(activeChat.last_seen)}`}</p>
                     )}
